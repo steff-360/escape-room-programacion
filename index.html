@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Escape Room educativo de programación">
+  <title>Escape Room | El código perdido</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <script src="js/app.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="./">⌘ <span>ESCAPE ROOM</span></a>
+    <span class="top-label">EL CÓDIGO PERDIDO</span>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <p class="eyebrow">MISIÓN DE RESCATE · DESARROLLO DE SOFTWARE</p>
+      <h1>El código<br><span>perdido.</span></h1>
+      <p>Un sistema informático ha bloqueado el laboratorio de programación. Supera cinco pruebas, reúne las partes del código secreto y recupera el acceso.</p>
+      <div class="hero-meta"><span>5 misiones</span><span>Trabajo en equipo</span><span>Nivel principiante</span></div>
+    </section>
+    <p id="connection-message" class="form-message hidden" role="status"></p>
+
+    <details class="teacher-guide card">
+      <summary>Guía para docentes: organización y cierre de la actividad</summary>
+      <div class="teacher-guide-content">
+        <p class="muted">Actividad presencial para equipos de 3 a 5 estudiantes. Duración: 35 a 50 minutos. Materiales: computadora, proyector y hojas.</p>
+        <p>Objetivo: resolver problemas mediante lógica y conocimientos tecnológicos. Proyecta la historia, deja entre 5 y 7 minutos por misión y pide a los equipos que expliquen sus respuestas. Reconoce tanto la rapidez como la colaboración.</p>
+        <h3 class="guide-subtitle">Preguntas para cerrar</h3>
+        <ul class="reflection-list">
+          <li>¿Cuál fue el reto más difícil?</li>
+          <li>¿Cómo se organizaron para encontrar las respuestas?</li>
+          <li>¿Qué hicieron cuando se equivocaron?</li>
+          <li>¿Qué aprendieron sobre trabajar en equipo?</li>
+        </ul>
+      </div>
+    </details>
+
+    <section id="auth-view" class="auth-grid">
+      <article class="card">
+        <div class="section-kicker">NUEVO PARTICIPANTE</div>
+        <h2>Crea tu cuenta</h2>
+        <p class="muted">Regístrate para guardar tu progreso.</p>
+        <form id="register-form">
+          <label for="fullName">Nombre y apellido</label>
+          <input id="fullName" name="fullName" maxlength="120" autocomplete="name" required>
+          <label for="registerUsername">Nombre de usuario</label>
+          <input id="registerUsername" name="username" minlength="3" maxlength="40" pattern="[a-zA-Z0-9_.-]+" autocomplete="username" required>
+          <small>Usa letras, números, punto, guion o guion bajo.</small>
+          <label for="registerPassword">Contraseña</label>
+          <input id="registerPassword" name="password" type="password" minlength="8" autocomplete="new-password" required>
+          <p class="muted">El sistema te asignará automáticamente a un equipo de hasta 5 estudiantes.</p>
+          <button class="button primary" type="submit">Registrarme</button>
+          <p id="register-message" class="form-message" role="status"></p>
+        </form>
+      </article>
+
+      <article class="card">
+        <div class="section-kicker">YA TENGO UNA CUENTA</div>
+        <h2>Iniciar sesión</h2>
+        <p class="muted">Continúa donde te quedaste.</p>
+        <form id="login-form">
+          <label for="loginUsername">Nombre de usuario</label>
+          <input id="loginUsername" name="username" autocomplete="username" required>
+          <label for="loginPassword">Contraseña</label>
+          <input id="loginPassword" name="password" type="password" autocomplete="current-password" required>
+          <button class="button primary" type="submit">Entrar al juego</button>
+          <p id="login-message" class="form-message" role="status"></p>
+        </form>
+        <div class="note"><strong>¿Eres administrador?</strong><br>Inicia sesión con la cuenta administrativa que se creó desde la terminal.</div>
+      </article>
+      <article class="card local-game-card">
+        <div class="section-kicker">PARTIDA RÁPIDA</div>
+        <h2>Entra al juego</h2>
+        <p class="muted">En la aplicación publicada, el sistema te asignará un equipo de hasta 5 estudiantes y la administradora verá tu nombre y avance. Si abres el archivo directamente, la partida se guarda solo en este dispositivo.</p>
+        <form id="local-game-form">
+          <label for="localPlayerName">Tu nombre</label>
+          <input id="localPlayerName" name="fullName" maxlength="120" autocomplete="name" required>
+          <button class="button primary" type="submit">Empezar a jugar</button>
+          <p id="local-game-message" class="form-message" role="status"></p>
+        </form>
+      </article>
+    </section>
+
+    <section id="student-view" class="hidden">
+      <div class="welcome-row card">
+        <div><div class="section-kicker">PARTICIPANTE</div><h2 id="student-name">Bienvenido</h2><p class="muted" id="student-team"></p></div>
+        <button class="button outline" id="logout-student">Cerrar sesión</button>
+      </div>
+      <div class="game-board">
+        <section class="card mission-map">
+          <div class="section-kicker">MAPA DEL LABORATORIO</div>
+          <h2>Puertas de seguridad</h2>
+          <div id="mission-map-items" class="mission-map-items" aria-label="Progreso de las misiones"></div>
+        </section>
+        <section class="card code-board">
+          <div class="section-kicker">CÓDIGO DE ESCAPE</div>
+          <h2>Fragmentos recuperados</h2>
+          <p class="muted">Cada puerta desbloqueada revela una parte del código.</p>
+          <div id="code-parts" class="code-parts" aria-live="polite"></div>
+        </section>
+      </div>
+      <div id="game-card" class="card game-card">
+        <div class="game-heading"><div><div class="section-kicker" id="mission-category">MISIÓN 01</div><h2 id="mission-title">Cargando misión...</h2></div><span class="counter" id="mission-counter"></span></div>
+        <div class="progress"><div id="progress-bar"></div></div>
+        <p class="room-status"><span class="status-light"></span> SALA ACTIVA · TRABAJO EN EQUIPO</p>
+        <p id="mission-story" class="muted"></p>
+        <pre id="mission-question"></pre>
+        <section class="memory-challenge" aria-labelledby="memory-title">
+          <div class="memory-heading">
+            <div><div class="section-kicker">RETO BONUS</div><h3 id="memory-title">Encuentra las parejas</h3></div>
+            <span id="memory-progress" class="counter">0 de 3 parejas</span>
+          </div>
+          <p class="muted">Voltea las cartas y encuentra sus parejas para desbloquear una pista.</p>
+          <div id="memory-cards" class="memory-cards" aria-label="Juego de memoria"></div>
+          <p id="memory-status" class="form-message" role="status">Encuentra las 3 parejas para ganar la pista.</p>
+          <button id="hint-button" class="button outline" type="button" disabled>Juega para desbloquear la pista</button>
+        </section>
+        <div id="mission-options" class="options"></div>
+        <div id="mission-feedback" class="form-message" role="status"></div>
+        <div class="game-actions"><button id="answer-button" class="button primary">Comprobar respuesta</button><button id="next-button" class="button primary hidden">Siguiente misión</button></div>
+        <p id="hint-text" class="hint hidden"></p>
+      </div>
+      <div id="game-complete" class="card hidden completion">
+        <div id="complete-icon" class="complete-icon">⌁</div>
+        <div id="escape-code-stage">
+          <div class="section-kicker">ÚLTIMO PASO</div>
+          <h2>La consola de salida</h2>
+          <p>Ordena los cinco fragmentos y escribe el código para abrir la puerta del laboratorio.</p>
+          <form id="escape-form" class="escape-form">
+            <label for="escape-code">Código secreto</label>
+            <input id="escape-code" name="code" autocomplete="off" maxlength="12" placeholder="Escribe el código" required>
+            <button class="button primary" type="submit">Desbloquear salida</button>
+            <p id="escape-message" class="form-message" role="status"></p>
+          </form>
+        </div>
+        <div id="escape-success" class="hidden">
+          <div class="section-kicker">ACCESO RESTAURADO</div>
+          <h2>¡Escaparon del laboratorio!</h2>
+          <p>Superaron las cinco pruebas, descifraron el código y trabajaron en equipo. ¡Misión cumplida!</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="admin-view" class="hidden">
+      <div class="welcome-row card">
+        <div><div class="section-kicker">PANEL DE CONTROL</div><h2>Administración</h2><p class="muted">Consulta los registros y el avance real de los participantes.</p></div>
+        <button class="button outline" id="logout-admin">Cerrar sesión</button>
+      </div>
+      <div class="stats-grid">
+        <article class="stat card"><span>Estudiantes</span><strong id="total-students">—</strong></article>
+        <article class="stat card"><span>Equipos</span><strong id="total-teams">—</strong></article>
+        <article class="stat card"><span>Misiones completadas</span><strong id="total-completions">—</strong></article>
+      </div>
+      <article class="card table-card"><div class="table-heading"><div><h3>Estudiantes registrados</h3><p class="muted">Incluye quienes entraron con cuenta y por partida rápida.</p></div><button class="button outline small" id="refresh-admin">Actualizar</button></div><div class="table-wrap"><table><thead><tr><th>Nombre</th><th>Acceso</th><th>Equipo</th><th>Misiones</th></tr></thead><tbody id="students-table"></tbody></table></div></article>
+      <article class="card table-card"><h3>Equipos</h3><div class="table-wrap"><table><thead><tr><th>Equipo</th><th>Integrantes</th><th>Misiones completadas</th></tr></thead><tbody id="teams-table"></tbody></table></div></article>
+    </section>
+    <footer>Actividad educativa · Escape Room de Programación</footer>
+  </main>
+</body>
+</html>
