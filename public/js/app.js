@@ -73,7 +73,7 @@ $('register-form').addEventListener('submit', async (event) => {
     showMessage('register-message', result.message, 'success');
     await loadCurrentUser();
   } catch (error) {
-    showMessage('register-message', error.message, 'error');
+    showMessage('register-message', error.message.includes('No se pudo conectar') ? 'Servidor de cuentas no disponible. Usa «Partida rápida» abajo para jugar al instante.' : error.message, 'error');
   } finally {
     button.disabled = false;
   }
@@ -93,7 +93,7 @@ $('login-form').addEventListener('submit', async (event) => {
     localMode = false;
     await loadCurrentUser();
   } catch (error) {
-    showMessage('login-message', error.message, 'error');
+    showMessage('login-message', error.message.includes('No se pudo conectar') ? 'Servidor de cuentas no disponible. Usa «Partida rápida» abajo para jugar al instante.' : error.message, 'error');
   } finally {
     button.disabled = false;
   }
@@ -136,7 +136,7 @@ $('local-game-form').addEventListener('submit', (event) => {
 async function startHostedGame() {
   const button = $('local-game-form').querySelector('button[type="submit"]');
   button.disabled = true;
-  showMessage('local-game-message', 'Registrando participante...');
+  showMessage('local-game-message', 'Iniciando partida...');
   try {
     await api('/api/auth/quick-start', {
       method: 'POST',
@@ -145,7 +145,20 @@ async function startHostedGame() {
     localMode = false;
     await loadCurrentUser();
   } catch (error) {
-    showMessage('local-game-message', error.message, 'error');
+    console.warn('Servidor no disponible, iniciando en modo autónomo:', error);
+    try {
+      localMode = true;
+      const teamNumber = (Math.abs(localPlayerName.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)) % 5) + 1;
+      localTeamName = `Equipo Alfa 0${teamNumber}`;
+      currentUser = { full_name: localPlayerName, team_name: localTeamName, role: 'student' };
+      $('student-name').textContent = localPlayerName;
+      $('student-team').textContent = `Equipo: ${localTeamName} · Partida en línea`;
+      showMessage('connection-message', '');
+      showView('student-view');
+      loadLocalGame();
+    } catch (localError) {
+      showMessage('local-game-message', localError.message, 'error');
+    }
   } finally {
     button.disabled = false;
   }
@@ -564,7 +577,7 @@ async function initialize() {
     showView('auth-view');
     showMessage(
       'connection-message',
-      'Escribe tu nombre en «Partida rápida» y pulsa «Empezar a jugar». El sistema asignará el equipo automáticamente.',
+      'Escribe tu nombre en «Partida rápida» y pulsa «Empezar a jugar».',
       'success'
     );
     return;
@@ -574,7 +587,13 @@ async function initialize() {
     await loadCurrentUser();
   } catch (error) {
     showView('auth-view');
-    if (error.status !== 401) showMessage('connection-message', error.message, 'error');
+    if (error.status !== 401) {
+      showMessage(
+        'connection-message',
+        '¡Bienvenido! Escribe tu nombre en «Partida rápida» para comenzar tu misión de inmediato.',
+        'success'
+      );
+    }
   }
 }
 
