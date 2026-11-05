@@ -17,7 +17,7 @@ Puedes jugar sin instalar Node.js ni PostgreSQL:
 1. Abre `public/index.html` en el navegador.
 2. Escribe tu nombre en la sección **Partida rápida**.
 
-Abierto como archivo, el juego conserva el progreso en ese dispositivo y muestra un equipo local; la asignación automática de grupos y el listado de la administradora requieren el servidor publicado.
+Sin conexión al servidor, **Partida rápida** conserva el progreso en ese dispositivo y muestra un equipo local; también funciona desde un hosting estático, pero no sincroniza datos. El registro, el inicio de sesión, la asignación automática de equipos y el listado de la administradora requieren abrir la aplicación publicada con su servidor Node.js y su base de datos PostgreSQL. Un hosting estático por sí solo no puede atender esas rutas de cuenta.
 
 ## Instalación local con cuentas y administración
 
@@ -62,13 +62,13 @@ Para registrar estudiantes, guardar resultados en PostgreSQL y usar el panel adm
 
 ## Publicar el juego en internet
 
-El archivo `render.yaml` prepara el servidor web para Render. La aplicación y la base de datos quedan alojadas en internet; el equipo local no tiene que permanecer encendido.
+El archivo `render.yaml` prepara en Render el servidor web, una base de datos PostgreSQL y la conexión entre ambos; el equipo local no tiene que permanecer encendido. La base gratuita de Render vence a los 30 días: después queda inaccesible y, tras 14 días adicionales sin actualizarla a un plan pagado, Render elimina sus datos. Úsala solo para probar, no para guardar información importante de estudiantes.
 
-1. Sube el proyecto a un repositorio privado de GitHub. No incluyas `.env` ni contraseñas.
-2. Crea una base PostgreSQL alojada, por ejemplo, en Neon. Copia su URL de conexión con SSL.
-3. En Render, crea un **Blueprint** y conecta el repositorio. Render leerá `render.yaml`; pega la URL de PostgreSQL cuando la solicite. Render genera automáticamente `JWT_SECRET`.
-4. Espera a que termine el despliegue. El servidor prepara las tablas y puedes comprobar que está activo en `/healthz`.
-5. Para crear el administrador, configura temporalmente `DATABASE_URL` en el `.env` local con la URL de la base alojada y ejecuta `npm run crear-admin`. No compartas ni subas ese archivo; después puedes borrar la URL del `.env`.
+1. Sube el proyecto a un repositorio de GitHub. No incluyas `.env` ni contraseñas.
+2. En Render, crea un **Blueprint** y conecta el repositorio. Render leerá `render.yaml` y solicitará autorización para crear el servidor y la base gratuita; también genera automáticamente `JWT_SECRET`.
+3. Espera a que termine el despliegue. El servidor prepara las tablas automáticamente; comprueba que está activo en `/healthz`.
+4. Para crear el administrador, abre la Shell del servicio web en Render y ejecuta `npm run crear-admin`. El comando usa la `DATABASE_URL` configurada en el servidor.
+5. Abre la URL que Render asigna al servicio para registrarte e iniciar sesión.
 
 El plan gratuito de Render puede suspender el servidor después de un periodo sin visitas. Para guardar datos de estudiantes de forma permanente, revisa los límites, pausas y políticas de conservación del proveedor de base de datos antes de usarlo en clase.
 

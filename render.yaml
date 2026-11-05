@@ -12,6 +12,14 @@ services:
       - key: NODE_VERSION
         value: "22"
       - key: DATABASE_URL
-        sync: false
+        fromDatabase:
+          name: escape-room-database
+          property: connectionString
       - key: JWT_SECRET
         generateValue: true
+
+databases:
+  - name: escape-room-database
+    databaseName: escape_room
+    user: escape_room_user
+    plan: free

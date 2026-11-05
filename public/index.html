@@ -47,7 +47,7 @@
           <label for="fullName">Nombre y apellido</label>
           <input id="fullName" name="fullName" maxlength="120" autocomplete="name" required>
           <label for="registerUsername">Nombre de usuario</label>
-          <input id="registerUsername" name="username" minlength="3" maxlength="40" pattern="[a-zA-Z0-9_.-]+" autocomplete="username" required>
+          <input id="registerUsername" name="username" minlength="3" maxlength="40" pattern="[a-zA-Z0-9_.\-]+" autocomplete="username" required>
           <small>Usa letras, números, punto, guion o guion bajo.</small>
           <label for="registerPassword">Contraseña</label>
           <input id="registerPassword" name="password" type="password" minlength="8" autocomplete="new-password" required>
@@ -74,7 +74,7 @@
       <article class="card local-game-card">
         <div class="section-kicker">PARTIDA RÁPIDA</div>
         <h2>Entra al juego</h2>
-        <p class="muted">En la aplicación publicada, el sistema te asignará un equipo de hasta 5 estudiantes y la administradora verá tu nombre y avance. Si abres el archivo directamente, la partida se guarda solo en este dispositivo.</p>
+        <p class="muted">Con el servidor de la aplicación, el sistema asigna tu equipo y guarda tu avance. Sin conexión al servidor, puedes jugar en este dispositivo, pero el progreso no se sincroniza y no podrás usar una cuenta.</p>
         <form id="local-game-form">
           <label for="localPlayerName">Tu nombre</label>
           <input id="localPlayerName" name="fullName" maxlength="120" autocomplete="name" required>

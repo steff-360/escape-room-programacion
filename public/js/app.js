@@ -7,9 +7,18 @@ const api = async (url, options = {}) => {
       headers: { 'Content-Type': 'application/json', ...(options.headers || {}) }
     });
   } catch {
-    throw new Error('No se pudo conectar con el servidor. Comprueba que la aplicación esté iniciada y vuelve a intentarlo.');
+    const error = new Error('No se pudo conectar con el servidor de cuentas. Puedes jugar en este dispositivo con «Partida rápida», pero para registrarte o iniciar sesión necesitas abrir la aplicación publicada con su servidor.');
+    error.apiUnavailable = true;
+    throw error;
   }
-  const data = await response.json().catch(() => ({}));
+  const contentType = response.headers.get('content-type') || '';
+  if (!contentType.includes('application/json')) {
+    const error = new Error('Este sitio no está conectado al servidor de cuentas. Puedes jugar en este dispositivo con «Partida rápida», pero para registrarte o iniciar sesión necesitas abrir la aplicación publicada con su servidor.');
+    error.status = response.status;
+    error.apiUnavailable = true;
+    throw error;
+  }
+  const data = await response.json();
   if (!response.ok) {
     const error = new Error(data.message || 'No fue posible completar la solicitud.');
     error.status = response.status;
@@ -117,6 +126,10 @@ $('local-game-form').addEventListener('submit', (event) => {
     return;
   }
 
+  startLocalGame();
+});
+
+function startLocalGame() {
   try {
     localMode = true;
     localTeamName = 'Equipo local';
@@ -126,12 +139,14 @@ $('local-game-form').addEventListener('submit', (event) => {
     showMessage('connection-message', '');
     showView('student-view');
     loadLocalGame();
+    return true;
   } catch (error) {
     localMode = false;
     showView('auth-view');
     showMessage('local-game-message', error.message, 'error');
+    return false;
   }
-});
+}
 
 async function startHostedGame() {
   const button = $('local-game-form').querySelector('button[type="submit"]');
@@ -145,19 +160,10 @@ async function startHostedGame() {
     localMode = false;
     await loadCurrentUser();
   } catch (error) {
-    console.warn('Servidor no disponible, iniciando en modo autónomo:', error);
-    try {
-      localMode = true;
-      const teamNumber = (Math.abs(localPlayerName.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)) % 5) + 1;
-      localTeamName = `Equipo Alfa 0${teamNumber}`;
-      currentUser = { full_name: localPlayerName, team_name: localTeamName, role: 'student' };
-      $('student-name').textContent = localPlayerName;
-      $('student-team').textContent = `Equipo: ${localTeamName} · Partida en línea`;
-      showMessage('connection-message', '');
-      showView('student-view');
-      loadLocalGame();
-    } catch (localError) {
-      showMessage('local-game-message', localError.message, 'error');
+    if (error.apiUnavailable && startLocalGame()) {
+      showMessage('connection-message', 'El servidor de cuentas no está disponible en este sitio. Estás jugando en este dispositivo; el progreso no se sincronizará.', 'success');
+    } else {
+      showMessage('local-game-message', error.message, 'error');
     }
   } finally {
     button.disabled = false;
