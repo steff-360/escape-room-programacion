@@ -18,6 +18,7 @@ const express = require('express');
 const helmet = require('helmet');
 const cookieParser = require('cookie-parser');
 const rateLimit = require('express-rate-limit');
+const bcrypt = require('bcryptjs');
 const db = require('./config/db');
 const authRoutes = require('./routes/auth.routes');
 const gameRoutes = require('./routes/game.routes');
@@ -49,10 +50,31 @@ app.use((error, req, res, next) => {
 
 const port = Number(process.env.PORT) || 3000;
 
+async function ensureAdminUser() {
+  try {
+    const adminCheck = await db.query("SELECT id FROM users WHERE role = 'admin' LIMIT 1");
+    if (adminCheck.rows.length === 0) {
+      const adminUser = (process.env.ADMIN_USER || 'admin').trim();
+      const adminPass = process.env.ADMIN_PASSWORD || 'AdminEscape2026!';
+      const hash = await bcrypt.hash(adminPass, 12);
+      await db.query(
+        `INSERT INTO users (full_name, username, password_hash, role)
+         VALUES ($1, $2, $3, 'admin')
+         ON CONFLICT (username) DO NOTHING`,
+        ['Profesor Administrador', adminUser, hash]
+      );
+      console.log(`[Admin] Cuenta administrativa inicial lista. Usuario: ${adminUser}`);
+    }
+  } catch (error) {
+    console.error('Error al inicializar la cuenta administrativa:', error);
+  }
+}
+
 async function start() {
   try {
     const schema = await fs.readFile(path.join(__dirname, '..', 'database', 'schema.sql'), 'utf8');
     await db.query(schema);
+    await ensureAdminUser();
     app.listen(port, () => {
       console.log(`Escape Room disponible en el puerto ${port}`);
     });

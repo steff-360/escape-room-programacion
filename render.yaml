@@ -17,6 +17,10 @@ services:
           property: connectionString
       - key: JWT_SECRET
         generateValue: true
+      - key: ADMIN_USER
+        value: admin
+      - key: ADMIN_PASSWORD
+        value: AdminEscape2026!
 
 databases:
   - name: escape-room-database
